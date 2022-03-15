@@ -1,0 +1,114 @@
+﻿@page "/Clientes"
+
+@inject IToastService Toast
+
+<EditForm Model="clientes" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+    <div class="card">
+
+        <div class="card-header text-center">
+            <h2>Registro de Clientes</h2>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Cliente Id</label>
+                        <div class="input-group">
+                            <InputNumber @bind-Value="clientes.ClienteId" class="form-control"/>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar"><i class="oi oi-magnifying-glass"/></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col form-group">
+                        <label>Nombre</label>
+                        <InputText @bind-Value="clientes.Nombre" class="form-control"/>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Tel&eacute;fono</label>
+                        <InputText @bind-Value="clientes.Telefono" class="form-control"/>
+                    </div>
+
+                    <div class="col form-group">
+                        <label>Direcci&oacute;n</label>
+                        <InputText @bind-Value="clientes.Direccion" class="form-control"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-footer">
+            <div class="form-group text-center" display: inline-block>
+                <button type="button" class="btn btn-lg btn-primary" @onclick="Nuevo"><i class="oi oi-file mr-2"/>Nuevo</button>
+                <button type="submit" class="btn btn-lg btn-success"><i class="oi oi-account-login mr-2" style="transform: rotate(90deg)"/>Guardar</button>
+                <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar"><i class="oi oi-trash mr-2"/>Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm> 
+
+@code {
+    private Clientes clientes = new Clientes();
+
+    protected override void OnInitialized()
+    {
+        Nuevo();
+        Buscar();
+    }
+
+    private void Buscar()
+    {
+        if (clientes.ClienteId > 0)
+        {
+            var encontrado = ClientesBLL.Buscar(clientes.ClienteId);
+
+            if (encontrado != null)
+                this.clientes = encontrado;
+            else
+                Toast.ShowWarning("Cliente no encontrado");
+
+        }
+    }
+
+    private void Nuevo()
+    {
+        clientes = new Clientes();
+    }
+
+    private void Guardar()
+    {
+        bool guardar;
+
+        guardar = ClientesBLL.Guardar(clientes);
+
+        if (guardar)
+        {
+            Nuevo();
+            Toast.ShowSuccess("Transacción Exitosa!!!");
+        }
+        else
+            Toast.ShowWarning("Transacción Fallida!!!");
+    }
+
+    private void Eliminar()
+    {
+        bool eliminar;
+
+        eliminar = ClientesBLL.Eliminar(clientes.ClienteId);
+
+        if (eliminar)
+        {
+            Nuevo();
+            Toast.ShowSuccess("Transacción Exitosa!!!");
+        }
+        else
+            Toast.ShowWarning("Transacción Fallida!!!");
+    }
+}

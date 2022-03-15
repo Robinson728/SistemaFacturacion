@@ -1,0 +1,132 @@
+﻿@page "/Facturas"
+
+@inject IToastService Toast
+
+<EditForm Model="facturas" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+    <div class="card">
+
+        <div class="card-header text-center">
+            <h2>Facturas</h2>
+        </div>
+
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Factura Id</label>
+                        <div class="input-group">
+                            <InputNumber @bind-Value="facturas.FacturaId" class="form-control" />
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar"><i class="oi oi-magnifying-glass" /></button>
+                            </div>
+                        </div>
+                    </div>
+                    @*cliente, direccion, nofactura, fecha, subtotal, total, itbis, tipo pago, pagado*@
+                    <div class="col form-group">
+                        <label>Cliente</label>
+                        <InputText @bind-Value="facturas.NombreCliente" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Direcci&oacute;n</label>
+                        <InputText @bind-Value="facturas.Direccion" class="form-control" />
+                    </div>
+
+                    <div class="col form-group">
+                        <label>No. Factura</label>
+                        <InputNumber @bind-Value="facturas.NoFactura" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col form-group">
+                        <label>Fecha</label>
+                        <InputDate @bind-Value="facturas.Fecha" class="form-control" />
+                    </div>
+
+                    <div class="col form-group">
+                        <label>Tipo de Pago</label>
+                        <InputNumber @bind-Value="facturas.TipoPago" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col form-group">
+                        <div class="form-check">
+                            <InputCheckbox @bind-Value="facturas.Pagado" class="form-check-input" type="checkbox" />
+                            <label class="form-check-label" for="gridCheck">Pagado</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-footer">
+            <div class="form-group text-center" display: inline-block>
+                <button type="button" class="btn btn-lg btn-primary" @onclick="Nuevo"><i class="oi oi-file mr-2"/>Nuevo</button>
+                <button type="submit" class="btn btn-lg btn-success"><i class="oi oi-account-login mr-2" style="transform: rotate(90deg)"/>Guardar</button>
+                <button type="button" class="btn btn-lg btn-danger" @onclick="Eliminar"><i class="oi oi-trash mr-2"/>Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm> 
+
+@code {
+    private Facturas facturas = new Facturas();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Nuevo();
+        Buscar();
+    }
+
+    private void Buscar()
+    {
+        if (facturas.FacturaId > 0)
+        {
+            var encontrado = FacturasBLL.Buscar(facturas.FacturaId);
+
+            if (encontrado != null)
+                this.facturas = encontrado;
+            else
+                Toast.ShowWarning("Factura no encontrada!");
+        }
+    }
+
+    private void Nuevo()
+    {
+        facturas = new Facturas();
+    }
+
+    private void Guardar()
+    {
+        var guardar = FacturasBLL.Guardar(facturas);
+
+        if (guardar)
+        {
+            Nuevo();
+            Toast.ShowInfo("Transacción Exitosa!");
+        }
+        else
+            Toast.ShowError("Transacción Fallida!");
+    }
+
+    private void Eliminar()
+    {
+        var eliminar = FacturasBLL.Eliminar(facturas.FacturaId);
+
+        if (eliminar)
+        {
+            Nuevo();
+            Toast.ShowInfo("Transacción Exitosa!");
+        }
+        else
+            Toast.ShowError("Transacción Fallida!");
+    }
+
+}
